@@ -3,18 +3,19 @@ import { DynamicDialogComponent } from './dynamicdialog';
 import { DynamicDialogInjector } from './dynamicdialog-injector';
 import { DynamicDialogConfig } from './dynamicdialog-config';
 import { DynamicDialogRef } from './dynamicdialog-ref';
+import { first } from 'rxjs/internal/operators/first';
 
 @Injectable()
 export class DialogService {
-    
-    dialogComponentRef: ComponentRef<DynamicDialogComponent>;
+
+    dialogComponentRef: Array<ComponentRef<DynamicDialogComponent>> = [];
 
     constructor(private componentFactoryResolver: ComponentFactoryResolver, private appRef: ApplicationRef, private injector: Injector) { }
 
     public open(componentType: Type<any>, config: DynamicDialogConfig) {
         const dialogRef = this.appendDialogComponentToBody(config);
 
-        this.dialogComponentRef.instance.childComponentType = componentType;
+        this.dialogComponentRef[this.dialogComponentRef.length - 1].instance.childComponentType = componentType;
 
         return dialogRef;
     }
@@ -26,7 +27,7 @@ export class DialogService {
         const dialogRef = new DynamicDialogRef();
         map.set(DynamicDialogRef, dialogRef);
 
-        const sub = dialogRef.onClose.subscribe(() => {
+        const sub = dialogRef.onClose.pipe(first()).subscribe(() => {
             this.removeDialogComponentFromBody();
             sub.unsubscribe();
         });
@@ -39,13 +40,14 @@ export class DialogService {
         const domElem = (componentRef.hostView as EmbeddedViewRef<any>).rootNodes[0] as HTMLElement;
         document.body.appendChild(domElem);
 
-        this.dialogComponentRef = componentRef;
+        this.dialogComponentRef.push(componentRef);
 
         return dialogRef;
     }
 
     private removeDialogComponentFromBody() {
-        this.appRef.detachView(this.dialogComponentRef.hostView);
-        this.dialogComponentRef.destroy();
+        this.appRef.detachView(this.dialogComponentRef[this.dialogComponentRef.length - 1].hostView);
+        this.dialogComponentRef[this.dialogComponentRef.length - 1].destroy();
+        this.dialogComponentRef.pop();
     }
 }
