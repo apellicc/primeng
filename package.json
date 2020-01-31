@@ -8,7 +8,8 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "dist": "ngc -p tsconfig-release.json && gulp build-assets && gulp build-exports"
   },
   "repository": {
     "type": "git",
