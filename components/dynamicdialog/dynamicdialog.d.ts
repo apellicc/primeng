@@ -1,9 +1,9 @@
-import { Type, ComponentFactoryResolver, OnDestroy, ComponentRef, AfterViewInit, ChangeDetectorRef, Renderer2, NgZone, ElementRef } from '@angular/core';
+import { Type, ComponentFactoryResolver, OnDestroy, ComponentRef, AfterViewInit, ChangeDetectorRef, Renderer2, NgZone, ElementRef, OnInit } from '@angular/core';
 import { AnimationEvent } from '@angular/animations';
 import { DynamicDialogContent } from './dynamicdialogcontent';
 import { DynamicDialogConfig } from './dynamicdialog-config';
 import { DynamicDialogRef } from './dynamicdialog-ref';
-export declare class DynamicDialogComponent implements AfterViewInit, OnDestroy {
+export declare class DynamicDialogComponent implements AfterViewInit, OnDestroy, OnInit {
     private componentFactoryResolver;
     private cd;
     renderer: Renderer2;
@@ -11,6 +11,7 @@ export declare class DynamicDialogComponent implements AfterViewInit, OnDestroy 
     private dialogRef;
     zone: NgZone;
     visible: boolean;
+    animationVisible: any;
     componentRef: ComponentRef<any>;
     mask: HTMLDivElement;
     insertionPoint: DynamicDialogContent;
@@ -19,6 +20,7 @@ export declare class DynamicDialogComponent implements AfterViewInit, OnDestroy 
     container: HTMLDivElement;
     documentEscapeListener: Function;
     constructor(componentFactoryResolver: ComponentFactoryResolver, cd: ChangeDetectorRef, renderer: Renderer2, config: DynamicDialogConfig, dialogRef: DynamicDialogRef, zone: NgZone);
+    ngOnInit(): void;
     ngAfterViewInit(): void;
     onOverlayClicked(evt: MouseEvent): void;
     onDialogClicked(evt: MouseEvent): void;

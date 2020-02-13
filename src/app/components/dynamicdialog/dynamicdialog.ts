@@ -1,4 +1,4 @@
-import { Component, NgModule, Type, ComponentFactoryResolver, ViewChild, OnDestroy, ComponentRef, AfterViewInit, ChangeDetectorRef, Renderer2, NgZone, ElementRef } from '@angular/core';
+import { Component, NgModule, Type, ComponentFactoryResolver, ViewChild, OnDestroy, ComponentRef, AfterViewInit, ChangeDetectorRef, Renderer2, NgZone, ElementRef, OnInit } from '@angular/core';
 import { trigger,state,style,transition,animate,AnimationEvent } from '@angular/animations';
 import { DynamicDialogContent } from './dynamicdialogcontent';
 import { DynamicDialogConfig } from './dynamicdialog-config';
@@ -10,10 +10,12 @@ import { DynamicDialogRef } from './dynamicdialog-ref';
 	selector: 'p-dynamicDialog',
 	template: `
 		<div #mask class="ui-widget-overlay ui-dialog-mask ui-dialog-mask-scrollblocker" *ngIf="visible" (click)="onMaskClick()"></div>
-		<div [ngClass]="{'ui-dialog ui-dynamicdialog ui-widget ui-widget-content ui-corner-all ui-shadow':true, 'ui-dialog-rtl': config.rtl}" [ngStyle]="config.style" [class]="config.styleClass"
-			[@animation]="{value: 'visible', params: {transitionParams: config.transitionOptions || '150ms cubic-bezier(0, 0, 0.2, 1)'}}" 
-			(@animation.start)="onAnimationStart($event)" (@animation.done)="onAnimationEnd($event)" role="dialog" *ngIf="visible"
-			[style.width]="config.width" [style.height]="config.height">
+
+
+		<div *ngIf="!this.config?.disabledAnimation && visible" [ngClass]="{'ui-dialog ui-dynamicdialog ui-widget ui-widget-content ui-corner-all ui-shadow':true, 'ui-dialog-rtl': config.rtl}" [ngStyle]="config.style" [class]="config.styleClass"
+			[@animation]="{ value: 'visible', params: {transitionParams: config.transitionOptions || '150ms cubic-bezier(0, 0, 0.2, 1)'} }"
+			(@animation.start)="onAnimationStart($event)" (@animation.done)="onAnimationEnd($event)"
+			role="dialog" [style.width]="config.width" [style.height]="config.height">
             <div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top" *ngIf="config.showHeader === false ? false: true">
                 <span class="ui-dialog-title">{{config.header}}</span>
                 <a [ngClass]="'ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all'" tabindex="0" role="button" (click)="close()" (keydown.enter)="close()" *ngIf="config.closable === false ? false : true">
@@ -26,6 +28,21 @@ import { DynamicDialogRef } from './dynamicdialog-ref';
 			<div class="ui-dialog-footer ui-widget-content" *ngIf="config.footer">
 				{{config.footer}}
             </div>
+		</div>
+		<div *ngIf="this.config?.disabledAnimation === true && visible" [ngClass]="{'ui-dialog ui-dynamicdialog ui-widget ui-widget-content ui-corner-all ui-shadow':true, 'ui-dialog-rtl': config.rtl}" [ngStyle]="config.style" [class]="config.styleClass"
+			role="dialog" [style.width]="config.width" [style.height]="config.height">
+			<div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top" *ngIf="config.showHeader === false ? false: true">
+				<span class="ui-dialog-title">{{config.header}}</span>
+				<a [ngClass]="'ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all'" tabindex="0" role="button" (click)="close()" (keydown.enter)="close()" *ngIf="config.closable === false ? false : true">
+					<span class="pi pi-times"></span>
+				</a>
+			</div>
+			<div class="ui-dialog-content ui-widget-content" [ngStyle]="config.contentStyle">
+				<ng-template pDynamicDialogContent></ng-template>
+			</div>
+			<div class="ui-dialog-footer ui-widget-content" *ngIf="config.footer">
+				{{config.footer}}
+			</div>
 		</div>
 	`,
 	animations: [
@@ -42,10 +59,10 @@ import { DynamicDialogRef } from './dynamicdialog-ref';
         ])
 	]
 })
-export class DynamicDialogComponent implements AfterViewInit, OnDestroy {
-
-	visible: boolean = true;
-
+export class DynamicDialogComponent implements AfterViewInit, OnDestroy, OnInit {
+	// @Input() disabledAnimation: boolean = false;
+	visible: boolean;
+	animationVisible: any;
 	componentRef: ComponentRef<any>;
 
 	mask: HTMLDivElement;
@@ -61,8 +78,20 @@ export class DynamicDialogComponent implements AfterViewInit, OnDestroy {
 	documentEscapeListener: Function;
 
 	constructor(private componentFactoryResolver: ComponentFactoryResolver, private cd: ChangeDetectorRef, public renderer: Renderer2,
-			public config: DynamicDialogConfig, private dialogRef: DynamicDialogRef, public zone: NgZone) { }
+			public config: DynamicDialogConfig, private dialogRef: DynamicDialogRef, public zone: NgZone) {
+				if (!this.config.disabledAnimation) {
+					this.animationVisible = {
+						value: 'visible', params: {transitionParams: this.config.transitionOptions || '150ms cubic-bezier(0, 0, 0.2, 1)'}
+					};
+				} else {
+					this.animationVisible = {};
+				}
+				this.visible = true;
+			}
 
+
+	ngOnInit(): void {
+	}
 	ngAfterViewInit() {
 		this.loadChildComponent(this.childComponentType);
 		this.cd.detectChanges();
