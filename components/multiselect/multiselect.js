@@ -591,7 +591,7 @@ var MultiSelect = /** @class */ (function () {
         }
     };
     MultiSelect.prototype.onWindowResize = function () {
-        if (!domhandler_1.DomHandler.isAndroid()) {
+        if (!domhandler_1.DomHandler.isAndroid() && !domhandler_1.DomHandler.isIOS()) {
             this.hide();
         }
     };
