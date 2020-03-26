@@ -833,7 +833,7 @@ export class MultiSelect implements OnInit,AfterViewInit,AfterContentInit,AfterV
     }
 
     onWindowResize() {
-        if (!DomHandler.isAndroid()) {
+        if (!DomHandler.isAndroid() && !DomHandler.isIOS()) {
             this.hide();
         }
     }
