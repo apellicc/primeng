@@ -662,7 +662,7 @@ export class Dropdown implements OnInit,AfterViewInit,AfterContentInit,AfterView
                 DomHandler.absolutePosition(this.overlay, this.containerViewChild.nativeElement);
             else
                 DomHandler.relativePosition(this.overlay, this.containerViewChild.nativeElement);
-        }        
+        }
     }
     
     onInputFocus(event) {
@@ -1081,7 +1081,7 @@ export class Dropdown implements OnInit,AfterViewInit,AfterContentInit,AfterView
     }
 
     onWindowResize() {
-        if (!DomHandler.isAndroid()) {
+        if (!DomHandler.isAndroid() && !DomHandler.isIOS()) {
             this.hide(event);
         }
     }
